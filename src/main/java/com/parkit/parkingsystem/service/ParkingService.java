@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem.service;
 
+import com.parkit.parkingsystem.constants.Fare;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
 import com.parkit.parkingsystem.dao.TicketDAO;
@@ -8,6 +9,7 @@ import com.parkit.parkingsystem.model.Ticket;
 import com.parkit.parkingsystem.util.InputReaderUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 
 import java.util.Date;
 
@@ -44,6 +46,13 @@ public class ParkingService {
                 ticket.setPrice(0);
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
+                
+                boolean isRecurrentUser = ticketDAO.checkRecurrentUser(vehicleRegNumber);
+                if (isRecurrentUser) {
+                	ticket.setDiscountStatus(true);
+                	System.out.println("Welcome back! As a recurring user of our parking lot, you'll benefit from a "+ Fare.DISCOUNT_RATE_FOR_RECURRENT_USERS +"% discount.");
+                }
+                else ticket.setDiscountStatus(false);
                 ticketDAO.saveTicket(ticket);
                 System.out.println("Generated Ticket and saved in DB");
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());

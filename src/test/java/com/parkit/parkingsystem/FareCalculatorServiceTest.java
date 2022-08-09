@@ -138,5 +138,22 @@ public class FareCalculatorServiceTest {
         fareCalculatorService.calculateFare(ticket);
         assertEquals( 0 , ticket.getPrice());
     }
+    
+    @Test
+    public void calculateFareCarForRecurrentUser(){
+        Date inTime = new Date();
+        inTime.setTime( System.currentTimeMillis() - (  12 * 60 * 60 * 1000) );//calculated for 12H 
+        Date outTime = new Date();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+
+        ticket.setInTime(inTime);
+        ticket.setOutTime(outTime);
+        ticket.setParkingSpot(parkingSpot);
+        ticket.setDiscountStatus(true); // Boolean for Recurrent Users is True (there were already a ticket with the Vehicle Number
+        fareCalculatorService.calculateFare(ticket);
+        assertEquals( (12 * Fare.CAR_RATE_PER_HOUR * (1- (Fare.DISCOUNT_RATE_FOR_RECURRENT_USERS / 100))) , ticket.getPrice());
+    }
+    
+    
 
 }
