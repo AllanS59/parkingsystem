@@ -29,6 +29,8 @@ public class ParkingServiceTest {
     private static ParkingSpotDAO parkingSpotDAO;
     @Mock
     private static TicketDAO ticketDAO;
+    
+    
 
     @BeforeEach
     private void setUpPerTest() {
@@ -57,5 +59,13 @@ public class ParkingServiceTest {
         parkingService.processExitingVehicle();
         verify(parkingSpotDAO, Mockito.times(1)).updateParking(any(ParkingSpot.class));
     }
+    
+    @Test //PROBLEME: SOUCI AU LANCEMENT DU TEST
+    public void getNextParkingNumberIfAvailableTest(){
+        when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);  //ajouté par moi
+        when(inputReaderUtil.readSelection()).thenReturn(1);  //ajouté par moi
 
+        parkingService.getNextParkingNumberIfAvailable();
+        verify(parkingSpotDAO, Mockito.times(1)).getNextAvailableSlot(any(ParkingType.class));
+    }    
 }
