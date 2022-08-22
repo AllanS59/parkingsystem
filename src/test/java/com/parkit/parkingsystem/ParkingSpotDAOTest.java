@@ -1,5 +1,6 @@
 package com.parkit.parkingsystem;
 
+import com.parkit.parkingsystem.config.DataBaseConfig;
 import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.dao.ParkingSpotDAO;
@@ -14,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -30,13 +32,16 @@ public class ParkingSpotDAOTest {
 	@Mock
 	private static Connection con;
 	@Mock
+	DataBaseConfig dataBaseConfig;
+	@Mock
 	private ResultSet result;
 	private ParkingSpot parkingSpot;
 	
     @BeforeEach
-	public void init() throws SQLException {
+	public void init() throws SQLException, ClassNotFoundException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(con.createStatement()).thenReturn(ps);
+		Mockito.when(dataBaseConfig.getConnection()).thenReturn(con);
 		parkingSpot = new ParkingSpot(1,ParkingType.CAR, false);
 		}
 	
@@ -51,7 +56,7 @@ public class ParkingSpotDAOTest {
 		
 		int nextAvailableSlot = parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR);
 		assertEquals(2,nextAvailableSlot);
-		//Mockito.verify(ps, times(1)).execute();		//Commenté en attendant solution
+		Mockito.verify(ps, times(1)).executeQuery();		
 	}
 	
 	@Test
@@ -60,10 +65,7 @@ public class ParkingSpotDAOTest {
 		
 		parkingSpotDAO.updateParking(parkingSpot);
 				
-		assertEquals(1,1);								//Test trivial pour voir recouvrement en attendant solution du verify commenté
-		//Mockito.verify(ps, times(1)).executeUpdate();	//Commenté en attendant solution
-		
-		
+		Mockito.verify(ps, times(1)).executeUpdate();
 	}
 	
 	

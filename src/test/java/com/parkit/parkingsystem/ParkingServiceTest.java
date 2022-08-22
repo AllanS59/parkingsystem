@@ -82,16 +82,16 @@ public class ParkingServiceTest {
     }   
     
     //@Test
-    public void getNextParkingNumberIfAvailableForWrongChoice(){
+    public void getNextParkingNumberIfAvailableForNoAvailableSpace() {
     	
-    	IllegalArgumentException thrown = Assertions.assertThrows(IllegalArgumentException.class, ()->{
-            	lenient().when(parkingSpotDAO.getNextAvailableSlot(ParkingType.BIKE)).thenReturn(4);
-            	lenient().when(inputReaderUtil.readSelection()).thenReturn(3);
-                
+    	Exception thrown = Assertions.assertThrows(Exception.class, ()->{
+            	lenient().when(parkingSpotDAO.getNextAvailableSlot(any())).thenReturn(0);
+            	lenient().when(inputReaderUtil.readSelection()).thenReturn(1);
+           
                 parkingService.getNextParkingNumberIfAvailable();   
         });
-    	
     	Assertions.assertNotNull(thrown);
+    	Assertions.assertEquals("Error fetching parking number from DB. Parking slots might be full", thrown.getMessage());
     }  
     
 }

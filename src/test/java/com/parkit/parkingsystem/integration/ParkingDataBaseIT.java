@@ -134,12 +134,10 @@ public class ParkingDataBaseIT {
         	dataBaseTestConfig.closeConnection(con);
         }
     	
-    	
-        
         //THEN
         assertEquals(1, parkingNumber); //Check that that the parking spot selected is the first one
     	assertEquals(1, parkingIsAvailable); //Check that that the parking spot is available in DB
-    	assertEquals("CAR", parkingType); //Check that that the parking spot is available in DB
+    	assertEquals("CAR", parkingType); //Check that that the parking spot is for correct vehicule
     	assertNotNull(ticket.getOutTime()); // check that a getOutTime were saved in DB
         
     }
