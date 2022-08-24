@@ -25,121 +25,120 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
-
-
 @ExtendWith(MockitoExtension.class)
 public class ParkingDataBaseIT {
 
-    private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
-    private static ParkingSpotDAO parkingSpotDAO;
-    private static TicketDAO ticketDAO;
-    private static DataBasePrepareService dataBasePrepareService;
+	private static DataBaseTestConfig dataBaseTestConfig = new DataBaseTestConfig();
+	private static ParkingSpotDAO parkingSpotDAO;
+	private static TicketDAO ticketDAO;
+	private static DataBasePrepareService dataBasePrepareService;
 
-    @Mock
-    private static InputReaderUtil inputReaderUtil;
+	@Mock
+	private static InputReaderUtil inputReaderUtil;
 
-    @BeforeAll
-    private static void setUp() throws Exception{
-        parkingSpotDAO = new ParkingSpotDAO();
-        parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
-        ticketDAO = new TicketDAO();
-        ticketDAO.dataBaseConfig = dataBaseTestConfig;
-        dataBasePrepareService = new DataBasePrepareService();
-    }
+	@BeforeAll
+	private static void setUp() throws Exception {
+		parkingSpotDAO = new ParkingSpotDAO();
+		parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
+		ticketDAO = new TicketDAO();
+		ticketDAO.dataBaseConfig = dataBaseTestConfig;
+		dataBasePrepareService = new DataBasePrepareService();
+	}
 
-    @BeforeEach
-    private void setUpPerTest() throws Exception {
-        when(inputReaderUtil.readSelection()).thenReturn(1);
-        when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-        dataBasePrepareService.clearDataBaseEntries();
-    }
+	@BeforeEach
+	private void setUpPerTest() throws Exception {
+		when(inputReaderUtil.readSelection()).thenReturn(1);
+		when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
+		dataBasePrepareService.clearDataBaseEntries();
+	}
 
-    @AfterAll
-    private static void tearDown(){
+	@AfterAll
+	private static void tearDown() {
 
-    }
+	}
 
-    @Test
-    public void testParkingACar(){
-    	//GIVEN
-    	ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        parkingService.processIncomingVehicle();
-    	
-      //WHEN
-        Ticket ticket = ticketDAO.getTicket("ABCDEF");
-    	ParkingSpot parkingSpot = ticket.getParkingSpot();
-    	int parkingNumber = 0;
-    	int parkingIsAvailable = 1;
-    	String parkingType = "UNDEFINED";
-    	
-    	Connection con = null;
-        try {
-            con = dataBaseTestConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement("select p.PARKING_NUMBER, p.AVAILABLE, p.TYPE from parking p where p.PARKING_NUMBER=?");
-            ps.setInt(1,parkingSpot.getId());
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                parkingNumber = rs.getInt(1);
-                parkingIsAvailable=rs.getInt(2);
-                parkingType=rs.getString(3);
+	@Test
+	public void testParkingACar() {
+		// GIVEN
+		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+		parkingService.processIncomingVehicle();
 
-            }
-            dataBaseTestConfig.closeResultSet(rs);
-            dataBaseTestConfig.closePreparedStatement(ps);
-        }catch (Exception ex){
-            
-        }finally {
-        	dataBaseTestConfig.closeConnection(con);
-        }
-    
-        //THEN
-        assertEquals(1, parkingNumber); //Check that that the parking spot selected is the first one
-    	assertEquals(0, parkingIsAvailable); //Check that that the parking spot is available in DB
-    	assertEquals("CAR", parkingType); //Check that that the parking spot is available in DB
-    	
-       
-    }
+		// WHEN
+		Ticket ticket = ticketDAO.getTicket("ABCDEF");
+		ParkingSpot parkingSpot = ticket.getParkingSpot();
+		int parkingNumber = 0;
+		int parkingIsAvailable = 1;
+		String parkingType = "UNDEFINED";
 
-    @Test
-    public void testParkingLotExit(){
-    	//GIVEN
-        testParkingACar();
-        ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-        parkingService.processExitingVehicle();
-        
-        //WHEN
-        Ticket ticket = ticketDAO.getTicket("ABCDEF");
-    	ParkingSpot parkingSpot = ticket.getParkingSpot();
-    	int parkingNumber = 0;
-    	int parkingIsAvailable = 0;
-    	String parkingType = "UNDEFINED";
-    	
-    	Connection con = null;
-        try {
-            con = dataBaseTestConfig.getConnection();
-            PreparedStatement ps = con.prepareStatement("select p.PARKING_NUMBER, p.AVAILABLE, p.TYPE from parking p where p.PARKING_NUMBER=?");
-            ps.setInt(1,parkingSpot.getId());
-            ResultSet rs = ps.executeQuery();
-            if(rs.next()){
-                parkingNumber = rs.getInt(1);
-                parkingIsAvailable=rs.getInt(2);
-                parkingType=rs.getString(3);
+		Connection con = null;
+		try {
+			con = dataBaseTestConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(
+					"select p.PARKING_NUMBER, p.AVAILABLE, p.TYPE from parking p where p.PARKING_NUMBER=?");
+			ps.setInt(1, parkingSpot.getId());
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				parkingNumber = rs.getInt(1);
+				parkingIsAvailable = rs.getInt(2);
+				parkingType = rs.getString(3);
 
-            }
-            dataBaseTestConfig.closeResultSet(rs);
-            dataBaseTestConfig.closePreparedStatement(ps);
-        }catch (Exception ex){
-            
-        }finally {
-        	dataBaseTestConfig.closeConnection(con);
-        }
-    	
-        //THEN
-        assertEquals(1, parkingNumber); //Check that that the parking spot selected is the first one
-    	assertEquals(1, parkingIsAvailable); //Check that that the parking spot is available in DB
-    	assertEquals("CAR", parkingType); //Check that that the parking spot is for correct vehicule
-    	assertNotNull(ticket.getOutTime()); // check that a getOutTime were saved in DB
-        
-    }
+			}
+			dataBaseTestConfig.closeResultSet(rs);
+			dataBaseTestConfig.closePreparedStatement(ps);
+		} catch (Exception ex) {
+
+		} finally {
+			dataBaseTestConfig.closeConnection(con);
+		}
+
+		// THEN
+		assertEquals(1, parkingNumber); // Check that that the parking spot selected is the first one
+		assertEquals(0, parkingIsAvailable); // Check that that the parking spot is available in DB
+		assertEquals("CAR", parkingType); // Check that that the parking spot is available in DB
+
+	}
+
+	@Test
+	public void testParkingLotExit() {
+		// GIVEN
+		testParkingACar();
+		ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+		parkingService.processExitingVehicle();
+
+		// WHEN
+		Ticket ticket = ticketDAO.getTicket("ABCDEF");
+		ParkingSpot parkingSpot = ticket.getParkingSpot();
+		int parkingNumber = 0;
+		int parkingIsAvailable = 0;
+		String parkingType = "UNDEFINED";
+
+		Connection con = null;
+		try {
+			con = dataBaseTestConfig.getConnection();
+			PreparedStatement ps = con.prepareStatement(
+					"select p.PARKING_NUMBER, p.AVAILABLE, p.TYPE from parking p where p.PARKING_NUMBER=?");
+			ps.setInt(1, parkingSpot.getId());
+			ResultSet rs = ps.executeQuery();
+			if (rs.next()) {
+				parkingNumber = rs.getInt(1);
+				parkingIsAvailable = rs.getInt(2);
+				parkingType = rs.getString(3);
+
+			}
+			dataBaseTestConfig.closeResultSet(rs);
+			dataBaseTestConfig.closePreparedStatement(ps);
+		} catch (Exception ex) {
+
+		} finally {
+			dataBaseTestConfig.closeConnection(con);
+		}
+
+		// THEN
+		assertEquals(1, parkingNumber); // Check that that the parking spot selected is the first one
+		assertEquals(1, parkingIsAvailable); // Check that that the parking spot is available in DB
+		assertEquals("CAR", parkingType); // Check that that the parking spot is for correct vehicule
+		assertNotNull(ticket.getOutTime()); // check that a getOutTime were saved in DB
+
+	}
 
 }

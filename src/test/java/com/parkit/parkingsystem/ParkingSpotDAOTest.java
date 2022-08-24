@@ -22,7 +22,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-
 public class ParkingSpotDAOTest {
 
 	@InjectMocks
@@ -36,37 +35,35 @@ public class ParkingSpotDAOTest {
 	@Mock
 	private ResultSet result;
 	private ParkingSpot parkingSpot;
-	
-    @BeforeEach
+
+	@BeforeEach
 	public void init() throws SQLException, ClassNotFoundException {
 		MockitoAnnotations.initMocks(this);
 		Mockito.when(con.createStatement()).thenReturn(ps);
 		Mockito.when(dataBaseConfig.getConnection()).thenReturn(con);
-		parkingSpot = new ParkingSpot(1,ParkingType.CAR, false);
-		}
-	
-	
+		parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
+	}
+
 	@Test
 	public void getNextAvailableSlotTest() throws SQLException {
 		Mockito.when(con.prepareStatement(DBConstants.GET_NEXT_PARKING_SPOT)).thenReturn(ps);
 		Mockito.when(ps.executeQuery()).thenReturn(result);
 		Mockito.when(result.next()).thenReturn(true);
-		
-		Mockito.when(result.getInt(1)).thenReturn(2); 
-		
+
+		Mockito.when(result.getInt(1)).thenReturn(2);
+
 		int nextAvailableSlot = parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR);
-		assertEquals(2,nextAvailableSlot);
-		Mockito.verify(ps, times(1)).executeQuery();		
+		assertEquals(2, nextAvailableSlot);
+		Mockito.verify(ps, times(1)).executeQuery();
 	}
-	
+
 	@Test
 	public void updateParkingTest() throws SQLException {
 		Mockito.when(con.prepareStatement(DBConstants.UPDATE_PARKING_SPOT)).thenReturn(ps);
-		
+
 		parkingSpotDAO.updateParking(parkingSpot);
-				
+
 		Mockito.verify(ps, times(1)).executeUpdate();
 	}
-	
-	
+
 }
