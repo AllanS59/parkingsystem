@@ -13,7 +13,7 @@ public class FareCalculatorService {
 		long inHour = ticket.getInTime().getTime();
 		long outHour = ticket.getOutTime().getTime();
 
-		double duration = (outHour - inHour) / 1000; // duration in seconds
+		double duration = (outHour - inHour) / (double) 1000; // duration in seconds
 		duration = duration / (60 * 60); // duration converted in hours
 
 		double ratioPriceForRecurrentUser = 1;

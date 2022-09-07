@@ -61,7 +61,7 @@ public class TicketDAOTest {
 	@Test
 	public void saveTicketTest() throws SQLException {
 		Mockito.when(con.prepareStatement(DBConstants.SAVE_TICKET)).thenReturn(ps);
-		
+
 		ticketDAO.saveTicket(ticket);
 		Mockito.verify(ps, times(1)).execute();	
 	}

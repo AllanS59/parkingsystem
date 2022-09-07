@@ -44,7 +44,9 @@ public class Ticket {
 	}
 
 	public Date getInTime() {
+		//return new Date(inTime.getTime());
 		return inTime;
+		
 	}
 
 	public void setInTime(Date inTime) {
@@ -52,6 +54,7 @@ public class Ticket {
 	}
 
 	public Date getOutTime() {
+		//return new Date(outTime.getTime());
 		return outTime;
 	}
 
